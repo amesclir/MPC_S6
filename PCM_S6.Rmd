@@ -1,0 +1,378 @@
+---
+title: "PCM_S6"
+author: "Marcial Escudero"
+date: "2024-01-15"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+MODELO DE PAGEL
+
+Mark Pagel (1994) diseño un modelo para comprobar la evolución dependiente de dos caracteres binarios. Lo llamamos a este modelo el model Pagel94.
+Sgiguiendo este método ajustamos dos modelos diferente y los comparamos. El primero de ellos es el modelo independiente que básicamente es ajustar el modelo Mk de manera independiente a nuestros dos rasgos binarios. La probabilidad del modelo independiente es justo el producto de la probabilidad de cada modelo (o lo que es lo mismo la suma de los logaritmos de las probabilidades).
+El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgos binario depende el otro y viceversa.
+En este segundo caso si tenemos dos rasgos A y B que tienen cada uno de ellos estados de caracter 0 y 1 lo que ocurre es que algunas de las combinaciones posibles (0+0. 0+1, 1+0, 1+1) tienden a aparecer juntas a lo largo de evolución y otras tiende a no aparecer juntas.
+Muchas veces el modelo dependiente se ajusta mejor que el independiente y podremos decir que esos dos caracteres tienen una evolución correlacionada (pero hay que tener cuidado, esto puede pasar incluso cuando no hay evolución correlacionada, por ejemplo cuando la tasa de evolución del caracter A depende del estado de caracter en B).
+
+Para ver estos modelos vamos a utilizar los datos publicados orginalmente por Benun Sutton & Wilson (2019). En este estudio los autores proponen que el cuidado parterno en peces oseos podría estar correlacionado con un caracter comportamental llamado pareja de desove que implica monogamia.
+Carguemos los datos disponible en este proyecto de R y comprobemos la hipótesis.
+```{r}
+
+## load the phytools package
+library(phytools)
+## read the Benun Sutton & Wilson phylogeny
+bonyfish.tree<-read.tree(file="bonyfish.tre")
+print(bonyfish.tree,printlen=3)
+
+## read the phenotypic trait data
+bonyfish.data<-read.csv(file="bonyfish.csv",row.names=1,stringsAsFactors=TRUE)
+head(bonyfish.data)
+
+## plot the tree with adjacent data matrix
+object<-plotTree.datamatrix(bonyfish.tree,bonyfish.data,fsize=0.5,yexp=1,header=FALSE,xexp=1.45,palettes=c("YlOrRd","PuBuGn"))
+## add a legend for trait 1
+leg<-legend(x="topright",names(object$colors$spawning_mode),cex=0.7,pch=22,pt.bg=object$colors$spawning_mode,pt.cex=1.5,bty="n",title="spawning mode")
+## add a second legend for trait 2
+leg<-legend(x=leg$rect$left+4.7,y=leg$rect$top-leg$rect$h,names(object$colors$paternal_care),cex=0.7,pch=22,pt.bg=object$colors$paternal_care,pt.cex=1.5,bty="n",title="paternal care")
+```
+
+Hemos usado el argumento stingsAsFactors = TRUE para que nuestro caracter discreto sea leido en R como factor en vez de como una simple consecusión de caracteres. Y hemos usado la función plotTree.datamatrix de phytools para representar de manera conjunta nuestra filogenia y nuestra matriz de datos. Además, esta función da como salida un objeto de R con la paleta de colores que se ha usado y que podemos usar para crear la leyenda.
+
+Ajustemos ahora el modelo Pagel94 mediante la función fitPagel de phytools.
+
+```{r}
+spawning_mode<-setNames(bonyfish.data[,1],rownames(bonyfish.data))
+paternal_care<-setNames(bonyfish.data[,2],rownames(bonyfish.data))
+
+parentalCare.fit<-fitPagel(bonyfish.tree,paternal_care,spawning_mode)
+print(parentalCare.fit)
+
+```
+
+Podemos apreciar como el ajuste del modelo dependiente es bastante mejor que el ajuste del modelo indpediente. Esto nos permite concluir que estos dos rasgos están evolutivamente corrleacionados.
+
+Veamos una represetnación del modelo.
+
+```{r}
+plot(parentalCare.fit,signif=4,cex.main=1,cex.sub=0.8,cex.traits=0.7,cex.rates=0.7,lwd=1)
+```
+
+Podemos apreciar como el cuidado parental y el comportamiento par de desove están evolutivamente correlacionados. 
+
+
+MODELOS CON MÚLTIPLES REGÍMENES
+
+Esto lo podemos hacer al menos de dos manera diferentes.
+En el primer método que vamos a estudiar propondremos diferentes regímenes para la evolución de nuestro caracter discreto y representaremos dichos regímenes en la filogenia (Revell et al., 2021). En realidad esto es muy parecido a lo que hicimos para comprobar diferenes regímenes del modelo OU en la clase anterior.
+
+Para ilustrar este modelo vamos a utilizar data set de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretametne del color de la papada de los lagartos.
+
+Carguemos los datos (los preparamos) y echemosle un vistazo.
+
+```{r}
+## read tree from file
+anolis.tree<-read.simmap(file="anolis.mapped.nex",version=1.5,format="nexus")
+anolis.tree
+
+## read data from file
+dewlap.data<-read.csv("dewlap.colors.csv",row.names=1,stringsAsFactors=TRUE)
+head(dewlap.data)
+
+## load geiger package
+library(geiger)
+## run name.check
+chk<-name.check(anolis.tree,dewlap.data)
+summary(chk)
+
+anolis.pruned<-drop.tip.simmap(anolis.tree,chk$tree_not_data)
+dewlap.pruned<-dewlap.data[anolis.pruned$tip.label,]
+name.check(anolis.pruned,dewlap.pruned)
+
+# set our colors for the discrete trait
+dewlap.colors<-setNames(levels(dewlap.pruned[,4]),levels(dewlap.pruned[,4]))
+## plot our tree with dewlap colors at the tips
+plotTree.datamatrix(anolis.pruned,X=dewlap.pruned[,4,drop=FALSE],colors=list(dewlap.colors),yexp=1,header=FALSE,xexp=1.2,offset=0.5)
+## set the colors for our regimes
+cols<-setNames(rainbow(n=6),c("CG","GB","TC","TG","Tr","Tw"))
+## graph our tree with mapped regimes on top of
+## the previous tree
+plot(anolis.pruned,colors=cols,ftype="off",outline=TRUE,add=TRUE,xlim=get("last_plot.phylo",envir=.PlotPhyloEnv)$x.lim,ylim=get("last_plot.phylo",envir=.PlotPhyloEnv)$y.lim)
+## add legends for both the tip states of dewlap
+## color and the mapped regimes
+leg<-legend(x="topright",legend=names(dewlap.colors),pch=22,pt.bg=dewlap.colors,pt.cex=1.5,title="Dewlap color",cex=0.7,bty="n")
+leg<-legend(x=leg$rect$left,y=leg$rect$top-leg$rect$h,legend=names(cols),pch=22,pt.bg=cols,pt.cex=1.5,title="Ecomorph",cex=0.7,bty="n")
+
+```
+
+Creemos un vector con nuestro caracter de interés (color de la papada de los lagartos).
+
+```{r}
+domcol<-setNames(dewlap.data$domcol,rownames(dewlap.data))
+```
+
+Ajustemos nuestro modelo. Usaremos un modelo ER para cada régimen (en este caso 6 regímenes).
+
+```{r}
+## fit the model using fitmultiMk
+fit.multi<-fitmultiMk(anolis.pruned,domcol)
+## print the results
+print(fit.multi,digits=2)
+```
+
+Veamos que modelo es mejor si el que acabamos de ajustar con varios regímenes o uno mucho más simple sin regímenes. Compararemos los modelos con el lmtest
+
+```{r}
+library(lmtest)
+
+fit.single<-fitMk(anolis.pruned,domcol,model="ER")
+print(fit.single,digits=2)
+
+lrtest(fit.single,fit.multi)
+
+```
+
+Podemos apreciar como nuestro modelo más complejo es peor que el modelo más simple.
+
+
+MODELIZANDO VARIACIÓN EN LAS TASAS MEDIANTE MODELOS CON TASAS DE VARIACIÓN OCULTAS
+
+La otra manera de modelizar heterogeneidad en las tasas evolutivas de modelos discretos es mediante el model Hidden-rate model. Como su nombre indica hay tasas "ocultas" de evolución de nuestro caracter discreto de interés. 
+
+Si teneos un caracter discreto binario con estados de caracter 1 y 0. Imagina que este rasgo no evoluciona de la misma manera en todos los clados del árbol filogenético. En cambio, hay clados donde evoluciona por ejemplo lentamente y otros en los que evoluciona mucho más rápido. Este modelo es capaz de molizar esas diferencias en la tasa evolutiva del rasgo a lo largo del árbol.
+
+Vamos a ver esto simulando algunos datos.
+
+Primero vamos hacerlo con un modelo simple.
+
+```{r}
+## set seed to make the code reproducible
+set.seed(7)
+## create a transition matrix between states under
+## a simple, Mk model
+Q.mk<-matrix(c(-1,1,1,-1),2,2,dimnames=list(0:1,0:1))
+## simulate a character history under this constant
+## rate model
+mk.tree<-sim.history(tree<-pbtree(n=100,scale=2),Q.mk,anc="0")
+```
+
+Y ahora vamos a simular los datos con tres estados de caracter, en vez de dos, pero sólo dos estados de caracter son visibles. Vamos combinar los resultados del segundo y tercer estado de caracter en uno solo.
+
+```{r}
+## create a hidden-rate transition matrix -- this matrix
+## has two different values for character 1: 1 and 1*
+Q.hrm<-matrix(c(-1,1,0,1,-1.5,0.5,0,0.1,-0.1),3,3,byrow=TRUE,dimnames=list(c(0:1,"1*"),c(0:1,"1*")))
+Q.hrm
+
+## simulte under the hidden rate model
+hrm.tree <-sim.history(tree,Q.hrm,anc="0",message=FALSE)
+```
+
+Vamos a visualizar la evolución de nuestro caracter binario y nuestro caracter con un estado oculto. Y vamos a combinar como hemos dicho antes los estados de caracter 1 y 1* en el segundo caso.
+
+```{r}
+## subdivide plot area
+par(mfrow=c(1,3))
+## set colors for graphing
+cols<-setNames(c("lightgray","black"),0:1)
+## plot simple Mk model
+plot(mk.tree,colors=cols,ftype="off",mar=c(1.1,2.1,3.1,0.1))
+legend("bottomleft",names(cols),pch=15,col=cols,pt.cex=2,bty="n")
+mtext("(a)",line=0,adj=0)
+## set colors for hidden rate model
+cols<-setNames(c("lightgray","black","slategray"),c(0:1,"1*"))
+## plot HRM, but with "hidden" state shown
+plot(hrm.tree,colors=cols,ftype="off",mar=c(1.1,2.1,3.1,0.1))
+legend("bottomleft",names(cols),pch=15,col=cols,pt.cex=2,bty="n")
+mtext("(b)",line=0,adj=0)
+## plot HRM but with two 1 states (1 and 1*) merged
+cols<-setNames(c("lightgray","black"),0:1)
+plot(tree<-mergeMappedStates(hrm.tree,c("1","1*"),"1"),color=cols,ftype="off",mar=c(1.1,2.1,3.1,0.1))
+legend("bottomleft",c("0","1/1*"),pch=15,col=cols,pt.cex=2,bty="n")
+mtext("(c)",line=0,adj=0)
+
+```
+
+
+Pasemos ahora a ajutar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en sqamatae.
+Recordemos que el segundo mejor modelo apoyaba una tedencía direccional hacia la peridad de dedos.
+Esta pérdida de dedos e incluso las extremidades ha pasado de manera muy reciente en algunos clado como el de los eslizones pero, sin embargo, ha pasado hace mucho tiempo en la evolución del grupo como por ejemplo en las serpientes.
+Nuestra hipótesis es que podríamos estar antes un modelo con tasas ocultas.
+Vamos a correr nuestro modelo como un caracter binario de pérdida o ganacia de extremidades (no vamos a tratar la evolución del número de dedos). 
+Carguemos los datos y preparemoslos para los análisis.
+
+```{r}
+## read data from file
+sqData<-read.csv("squamate-data.csv",row.names=1)
+## read tree from file
+sqTree<-read.nexus("squamate.tre")
+## match tree and data
+chk<-name.check(sqTree,sqData)
+sqTree.pruned<-drop.tip(sqTree,chk$tree_not_data)
+sqData.pruned<-sqData[sqTree.pruned$tip.label,,drop=FALSE]
+## extra number of hindfoot toes
+toes<-setNames(sqData.pruned[,"rear.toes"],rownames(sqData.pruned))
+
+##Now that we have our data for hindfoot toe number, we can proceed to convert it to thebinary condition "limbed" (for toes>0) and "limbless" (otherwise)
+## create vector of NAs
+limbs<-setNames(rep(NA,length(toes)),names(toes))
+## set all values of toes > 0 to "limbed"
+limbs[toes>0]<-"limbed"
+## do the converse for toes == 0
+limbs[toes==0]<-"limbless"
+## convert to factor
+limbs<-as.factor(limbs)
+```
+
+Ya estamos listos para ajustar nuestro modelo. Para ello vamos a utilizar la función fitHRM de phytools.
+Compararemos cuatro modelos diferentes. 
+En primer lugar un modelo en el que que tenemos nuestros dos estados de caracter con y sin extremidades y cada uno de estos estados tiene un estado oculto. No están permitidos los cambios entre los estados ocultos o desde un estado oculto al otro estado observado (es decir, no están permitidos dos cambios simultaneos). Esto lo indicamos con los argumentos umbral TRUE (no está permitidos los cambios entre estados ocultos) y ncat = 2 (dos categorías de tasas en cada estado).
+
+```{r}
+limb.HRM1<-fitHRM(sqTree.pruned,limbs,ncat=2,model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
+print(limb.HRM1,digits=4)
+##niter = number of iterations
+##opt.method = method for optimization
+```
+
+Cómo modelo alternativo podemos considerar uno en el que sólo en el estado sin extremidades tenemos estados y tasas ocultas. Esto lo podemos cambiar con el argumetno ncat = c(1,2).
+
+```{r}
+limb.HRM2<-fitHRM(sqTree.pruned,limbs,ncat=c(1,2),model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
+print(limb.HRM2,digits=4)
+```
+
+Luego ajustamos el modelo contrario donde hay estados y tasas ocultas solo en los organismos que si tienen extremidades.
+```{r}
+## fit a HRM with a hidden state for limbed but not limbless
+limb.HRM3<-fitHRM(sqTree.pruned,limbs,ncat=c(2,1),model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
+print(limb.HRM3,digits=4)
+
+```
+
+Y por ultimo un modelo sin estados ni tasas ocultas. Lo ajustamos con la misma función que los otros pero lo podríamos hacer con las funciones fitDriscrete de geiger o fitMk de phytools. Esto nos lleva a la conclusión de que los modelos estándares de Mk son casos especiales de los modelos con tasas ocultas.
+
+```{r}
+## fit a HRM with a hidden state for limbed but not limbless
+## fit a standard ARD model using fitHRM
+limb.Mk<-fitHRM(sqTree.pruned,limbs,ncat=1,model="ARD",umbral=TRUE,pi="fitzjohn",niter=1,opt.method="nlminb")
+print(limb.HRM3,digits=4)
+```
+
+Representemos nuestros modelos.
+```{r}
+## subdivide our plotting area
+par(mfrow=c(2,2))
+## plot each of our four different fitted models
+plot(limb.HRM1,spacer=0.25,mar=c(0.1,1.1,2.1,0.1))
+mtext("(a)",line=0,adj=0)
+plot(limb.HRM2,spacer=0.25,mar=c(0.1,1.1,2.1,0.1))
+mtext("(b)",line=0,adj=0)
+plot(limb.HRM3,spacer=0.25,mar=c(0.1,1.1,2.1,0.1))
+mtext("(c)",line=0,adj=0)
+plot(limb.Mk,spacer=0.25,mar=c(0.1,1.1,2.1,0.1))
+mtext("(d)",line=0,adj=0)
+```
+
+Y comparamos el ajuste de los cuatro modelos.
+
+```{r}
+data.frame(model=c("4-state HRM","limbless hidden","limbed hidden","Mk model"),logL=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),logLik),k=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),function(x) length(x$rates)),AIC=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),AIC))
+```
+
+El mejor modelos es el más simple.
+
+
+Vamos a ver otro ejemplo pero esta vez vamos a usar el la función coHMM del paquete con el mismo nombre (odel of Beaulieu et al., 2013, 2020).
+Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del poen bicelular y tricelular. Usaremos un subconjunto de datos  para agelizar el proceso computacional.
+
+Carguemos lo datos, observemoslos y preparemoslos para los análisis. Fíjate que para usar corHMM hemos puesto los datos de polén en un formato concreto.
+
+```{r}
+## read tree
+pollen.tree<-read.tree(file="pollen-tree.phy")
+print(pollen.tree,printlen=3)
+
+## read data
+pollen.data<-read.csv(file="pollen-data.csv",row.names=1)
+head(pollen.data)
+
+## check to verify tree and data match
+name.check(pollen.tree,pollen.data)
+
+pollen<-data.frame(Genus.species=rownames(pollen.data),pollen.number=pollen.data[,1]-1)
+head(pollen)
+```
+
+Ya podemos ajustar el modelo.
+
+```{r}
+library(corHMM)
+fit.pollen<-corHMM(pollen.tree,pollen,rate.cat=3,nstarts=10,root.p="maddfitz")
+fit.pollen
+```
+
+Con el argumento ncat elegimos el número de categorías, en este caso 3, que fue el mejor modelo en la publicación de Williams ete al. (2014). Con nstarts elegimos el número de optimizaciones (10) y con root.p la distribución a priori de probabilidades de estado en la raiz del árbol (maddfitz es la misma que hemos usaso en fitDiscrete hasta ahora y también en la función fitHMM con el argumento pi = "fitzjohn" (Maddison et al., 207; Fitzjohn et al., 2009)).
+
+Este modelo que hemos ajustado es altamente complejo. Lo podemos visualizar con la función plotMKmodel de corHMM. 
+
+```{r}
+plotMKmodel(fit.pollen,display="square",text.scale=0.5,vertex.scale=0.6,arrow.scale=0.5)
+
+```
+
+O visualizar directamente la matriz Q.
+
+```{r}
+plot(as.Qmatrix(fit.pollen),show.zeros=FALSE,lwd=1,cex.traits=0.7)
+```
+
+Finalmente podemos representar la evolución del caracter en la filogenia.
+
+```{r}
+## create a new matrix containing the tip and internal node
+## marginal likelihoods
+states<-rbind(fit.pollen$tip.states[pollen.tree$tip.label,],fit.pollen$states)
+rownames(states)<-1:max(pollen.tree$edge)
+## normalize each row to sum to 1.0
+states<-t(apply(states,1,function(x) x/sum(x)))
+## set the colors for plotting
+reds<-c("#ec9488","#eb5a46","#933b27")
+blues<-c("#8bbdd9","#0079bf","#094c72")
+COLS<-c(reds[1],blues[1],reds[2],blues[2],reds[3],blues[3])
+## plot the tree nstates times, using transparency colors
+for(i in 1:ncol(states)){
+  tree<-pollen.tree
+  edge.col<-rep(NA,nrow(tree$edge))
+  for(j in 1:nrow(tree$edge)){
+    edge.col[j]<-make.transparent(COLS[i],mean(states[tree$edge[j,],i]))
+    tree<-paintBranches(tree,tree$edge[j,2], 
+                        as.character(j))
+}
+cols<-setNames(edge.col,1:nrow(tree$edge))
+plot(tree,type="fan",colors=cols,ftype="off",lwd=1,add=(i!=1))
+}
+## add node labels using pies to show marginal probabilities
+## at each node
+par(fg="transparent")
+nodelabels(pie=fit.pollen$states,piecol=COLS,cex=0.2)
+par(fg="black")
+## finally, add a legend
+legend("topleft",rownames(fit.pollen$solution)[c(1,3,5,2,4,6)],pch=15,col=COLS[c(1,3,5,2,4,6)],pt.cex=2,bty="n")
+
+```
+
+
+
+#####################
+ACTIVIDADES.
+
+1. El modelo de Pagel94 que hemos utilizado es en el que el caracter x depende de y viceversa. No obstante, también se puede ajustar este modelo de manera que x depende y y no al contrario, o bien que y depende de x y no al contrario. Ajusta esos modelos a nuestro caso de estudio del cuidado parental en peces óseos y compáralo con el modelo de Pagel original.
+
+```{r}
+##Your code here
+
+
+```
+
