@@ -24,3 +24,6 @@ parentalCare.fitx<-fitPagel(bonyfish.tree,paternal_care,spawning_mode, dep.var="
 print(parentalCare.fitx)
 parentalCare.fity<-fitPagel(bonyfish.tree,paternal_care,spawning_mode, dep.var="y")
 print(parentalCare.fity)
+
+#There are not really significant difference between the three models, although the best is fitx
+plot(parentalCare.fitx,signif=4,cex.main=1,cex.sub=0.8,cex.traits=0.7,cex.rates=0.7,lwd=1)

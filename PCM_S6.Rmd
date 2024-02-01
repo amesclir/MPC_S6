@@ -12,8 +12,8 @@ MODELO DE PAGEL
 
 Mark Pagel (1994) diseño un modelo para comprobar la evolución dependiente de dos caracteres binarios. Lo llamamos a este modelo el model Pagel94.
 Sgiguiendo este método ajustamos dos modelos diferente y los comparamos. El primero de ellos es el modelo independiente que básicamente es ajustar el modelo Mk de manera independiente a nuestros dos rasgos binarios. La probabilidad del modelo independiente es justo el producto de la probabilidad de cada modelo (o lo que es lo mismo la suma de los logaritmos de las probabilidades).
-El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgos binario depende el otro y viceversa.
-En este segundo caso si tenemos dos rasgos A y B que tienen cada uno de ellos estados de caracter 0 y 1 lo que ocurre es que algunas de las combinaciones posibles (0+0. 0+1, 1+0, 1+1) tienden a aparecer juntas a lo largo de evolución y otras tiende a no aparecer juntas.
+El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgos binario depende Del otro y viceversa.
+En este segundo caso si tenemos dos rasgos A y B que tienen cada uno de ellos estados de caracter 0 y 1 lo que ocurre es que algunas de las combinaciones posibles (0+0, 0+1, 1+0, 1+1) tienden a aparecer juntas a lo largo de evolución y otras tiende a no aparecer juntas.
 Muchas veces el modelo dependiente se ajusta mejor que el independiente y podremos decir que esos dos caracteres tienen una evolución correlacionada (pero hay que tener cuidado, esto puede pasar incluso cuando no hay evolución correlacionada, por ejemplo cuando la tasa de evolución del caracter A depende del estado de caracter en B).
 
 Para ver estos modelos vamos a utilizar los datos publicados orginalmente por Benun Sutton & Wilson (2019). En este estudio los autores proponen que el cuidado parterno en peces oseos podría estar correlacionado con un caracter comportamental llamado pareja de desove que implica monogamia.
@@ -51,7 +51,7 @@ print(parentalCare.fit)
 
 ```
 
-Podemos apreciar como el ajuste del modelo dependiente es bastante mejor que el ajuste del modelo indpediente. Esto nos permite concluir que estos dos rasgos están evolutivamente corrleacionados.
+Podemos apreciar como el ajuste del modelo dependiente es bastante mejor que el ajuste del modelo indpediente. Esto nos permite concluir que estos dos rasgos están evolutivamente correlacionados.
 
 Veamos una represetnación del modelo.
 
@@ -62,10 +62,10 @@ plot(parentalCare.fit,signif=4,cex.main=1,cex.sub=0.8,cex.traits=0.7,cex.rates=0
 Podemos apreciar como el cuidado parental y el comportamiento par de desove están evolutivamente correlacionados. 
 
 
-MODELOS CON MÚLTIPLES REGÍMENES
+MODELOS DE EVOLUCÓN DE CARACTERES DISCRETOS CON MÚLTIPLES REGÍMENES
 
 Esto lo podemos hacer al menos de dos manera diferentes.
-En el primer método que vamos a estudiar propondremos diferentes regímenes para la evolución de nuestro caracter discreto y representaremos dichos regímenes en la filogenia (Revell et al., 2021). En realidad esto es muy parecido a lo que hicimos para comprobar diferenes regímenes del modelo OU en la clase anterior.
+En el primer método que vamos a estudiar propondremos diferentes regímenes para la evolución de nuestro caracter discreto y representaremos dichos regímenes en la filogenia (Revell et al., 2021). En realidad esto es muy parecido a lo que hicimos para comprobar diferenTes regímenes del modelo OU en la clase anterior.
 
 Para ilustrar este modelo vamos a utilizar data set de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretametne del color de la papada de los lagartos.
 
@@ -121,7 +121,7 @@ fit.multi<-fitmultiMk(anolis.pruned,domcol)
 print(fit.multi,digits=2)
 ```
 
-Veamos que modelo es mejor si el que acabamos de ajustar con varios regímenes o uno mucho más simple sin regímenes. Compararemos los modelos con el lmtest
+Veamos que modelo es mejor si el que acabamos de ajustar con varios regímenes o uno mucho más simple sin regímenes. Compararemos los modelos con el lmtest.
 
 ```{r}
 library(lmtest)
@@ -140,7 +140,7 @@ MODELIZANDO VARIACIÓN EN LAS TASAS MEDIANTE MODELOS CON TASAS DE VARIACIÓN OCU
 
 La otra manera de modelizar heterogeneidad en las tasas evolutivas de modelos discretos es mediante el model Hidden-rate model. Como su nombre indica hay tasas "ocultas" de evolución de nuestro caracter discreto de interés. 
 
-Si teneos un caracter discreto binario con estados de caracter 1 y 0. Imagina que este rasgo no evoluciona de la misma manera en todos los clados del árbol filogenético. En cambio, hay clados donde evoluciona por ejemplo lentamente y otros en los que evoluciona mucho más rápido. Este modelo es capaz de molizar esas diferencias en la tasa evolutiva del rasgo a lo largo del árbol.
+Si tenemos un caracter discreto binario con estados de caracter 1 y 0. Imagina que este rasgo no evoluciona de la misma manera en todos los clados del árbol filogenético. En cambio, hay clados donde evoluciona por ejemplo lentamente y otros en los que evoluciona mucho más rápido. Este modelo es capaz de modelizar esas diferencias en la tasa evolutiva del rasgo a lo largo del árbol.
 
 Vamos a ver esto simulando algunos datos.
 
@@ -194,9 +194,11 @@ mtext("(c)",line=0,adj=0)
 
 ```
 
+Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente entre estados y otras veces el estado de caracter 1 se mantiene estabale en a lo largo de mucho tiempo evolutivo (en el panel a los cambios son simpre frecuentes). En el panel b podemos observar que en realidad estamos en el estado 1* cuando en el panel c pensamos que estamos en el estado 1.
 
-Pasemos ahora a ajutar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en sqamatae.
-Recordemos que el segundo mejor modelo apoyaba una tedencía direccional hacia la peridad de dedos.
+
+Pasemos ahora a ajutar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en el linaje squamatae.
+Recordemos que el segundo mejor modelo apoyaba una tedencía direccional hacia la perdida de dedos.
 Esta pérdida de dedos e incluso las extremidades ha pasado de manera muy reciente en algunos clado como el de los eslizones pero, sin embargo, ha pasado hace mucho tiempo en la evolución del grupo como por ejemplo en las serpientes.
 Nuestra hipótesis es que podríamos estar antes un modelo con tasas ocultas.
 Vamos a correr nuestro modelo como un caracter binario de pérdida o ganacia de extremidades (no vamos a tratar la evolución del número de dedos). 
@@ -227,24 +229,28 @@ limbs<-as.factor(limbs)
 
 Ya estamos listos para ajustar nuestro modelo. Para ello vamos a utilizar la función fitHRM de phytools.
 Compararemos cuatro modelos diferentes. 
-En primer lugar un modelo en el que que tenemos nuestros dos estados de caracter con y sin extremidades y cada uno de estos estados tiene un estado oculto. No están permitidos los cambios entre los estados ocultos o desde un estado oculto al otro estado observado (es decir, no están permitidos dos cambios simultaneos). Esto lo indicamos con los argumentos umbral TRUE (no está permitidos los cambios entre estados ocultos) y ncat = 2 (dos categorías de tasas en cada estado).
+En primer lugar un modelo en el que que tenemos nuestros dos estados de caracter con y sin extremidades y cada uno de estos estados tiene un estado oculto. No están permitidos los cambios entre los estados ocultos o desde un estado oculto al otro estado observado (es decir, no están permitidos dos cambios simultaneos). Esto lo indicamos con los argumentos umbral = TRUE (no está permitidos los cambios entre estados ocultos) y ncat = 2 (dos categorías de tasas en cada estado).
 
 ```{r}
+### warning, this may take a while
 limb.HRM1<-fitHRM(sqTree.pruned,limbs,ncat=2,model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
 print(limb.HRM1,digits=4)
 ##niter = number of iterations
 ##opt.method = method for optimization
 ```
 
-Cómo modelo alternativo podemos considerar uno en el que sólo en el estado sin extremidades tenemos estados y tasas ocultas. Esto lo podemos cambiar con el argumetno ncat = c(1,2).
+Cómo modelo alternativo podemos considerar uno en el que sólo en el estado sin extremidades tenemos estados y tasas ocultas (pero no en el estado con extremidades). Esto lo podemos cambiar con el argumetno ncat = c(1,2).
 
 ```{r}
+### warning, this may take a while
 limb.HRM2<-fitHRM(sqTree.pruned,limbs,ncat=c(1,2),model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
 print(limb.HRM2,digits=4)
 ```
 
-Luego ajustamos el modelo contrario donde hay estados y tasas ocultas solo en los organismos que si tienen extremidades.
+Luego ajustamos el modelo contrario donde hay estados y tasas ocultas solo en los organismos que si tienen extremidades. Esto lo hacemos con el argumento ncat=c(2,1).
+
 ```{r}
+### warning, this may take a while
 ## fit a HRM with a hidden state for limbed but not limbless
 limb.HRM3<-fitHRM(sqTree.pruned,limbs,ncat=c(2,1),model="ARD",umbral=TRUE,pi="fitzjohn",niter=5,opt.method="nlminb")
 print(limb.HRM3,digits=4)
@@ -260,7 +266,7 @@ limb.Mk<-fitHRM(sqTree.pruned,limbs,ncat=1,model="ARD",umbral=TRUE,pi="fitzjohn"
 print(limb.HRM3,digits=4)
 ```
 
-Representemos nuestros modelos.
+Representemos nuestros modelos para visualizarlos mejor.
 ```{r}
 ## subdivide our plotting area
 par(mfrow=c(2,2))
@@ -281,11 +287,12 @@ Y comparamos el ajuste de los cuatro modelos.
 data.frame(model=c("4-state HRM","limbless hidden","limbed hidden","Mk model"),logL=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),logLik),k=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),function(x) length(x$rates)),AIC=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),AIC))
 ```
 
-El mejor modelos es el más simple.
+El mejor modelos es el más simple. Y el segundo mejor el limbless hidden.
 
 
-Vamos a ver otro ejemplo pero esta vez vamos a usar el la función coHMM del paquete con el mismo nombre (odel of Beaulieu et al., 2013, 2020).
-Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del poen bicelular y tricelular. Usaremos un subconjunto de datos  para agelizar el proceso computacional.
+Vamos a ver otro ejemplo pero esta vez vamos a usar el la función corHMM del paquete con el mismo nombre (Beaulieu et al., 2013; Boyko & Beaulieu, 2021)
+
+Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del polen bicelular y tricelular. Usaremos un subconjunto de datos  para agelizar el proceso computacional.
 
 Carguemos lo datos, observemoslos y preparemoslos para los análisis. Fíjate que para usar corHMM hemos puesto los datos de polén en un formato concreto.
 
@@ -309,11 +316,12 @@ Ya podemos ajustar el modelo.
 
 ```{r}
 library(corHMM)
+### warning!!! this may take a while!!!!
 fit.pollen<-corHMM(pollen.tree,pollen,rate.cat=3,nstarts=10,root.p="maddfitz")
 fit.pollen
 ```
 
-Con el argumento ncat elegimos el número de categorías, en este caso 3, que fue el mejor modelo en la publicación de Williams ete al. (2014). Con nstarts elegimos el número de optimizaciones (10) y con root.p la distribución a priori de probabilidades de estado en la raiz del árbol (maddfitz es la misma que hemos usaso en fitDiscrete hasta ahora y también en la función fitHMM con el argumento pi = "fitzjohn" (Maddison et al., 207; Fitzjohn et al., 2009)).
+Con el argumento ncat elegimos el número de categorías, en este caso 3, que fue el mejor modelo en la publicación de Williams ete al. (2014). Con nstarts elegimos el número de optimizaciones (10) y con root.p la distribución a priori de probabilidades de estado en la raiz del árbol (maddfitz es la misma que hemos usaso en fitDiscrete hasta ahora y también en la función fitHMM con el argumento pi = "fitzjohn" (Maddison et al., 2007; Fitzjohn et al., 2009)).
 
 Este modelo que hemos ajustado es altamente complejo. Lo podemos visualizar con la función plotMKmodel de corHMM. 
 
@@ -376,3 +384,27 @@ ACTIVIDADES.
 
 ```
 
+BIBLIOGRAFÍA BÁSICA
+
+Pagel, M. (1994). Detecting correlated evolution on phylogenies: a general method for the comparative analysis of discrete characters. Proceedings of the Royal Society of London. Series B: Biological Sciences, 255(1342), 37-45.
+
+
+BIBLIOGRAFÍA RECOMENDADA
+
+Benun Sutton, F., & Wilson, A. B. (2019). Where are all the moms? External fertilization predicts the rise of male parental care in bony fishes. Evolution, 73(12), 2451-2460.
+
+Beaulieu, J. M., O'Meara, B. C., & Donoghue, M. J. (2013). Identifying hidden rate changes in the evolution of a binary morphological character: the evolution of plant habit in campanulid angiosperms. Systematic biology, 62(5), 725-737.
+
+Boyko, J. D., & Beaulieu, J. M. (2021). Generalized hidden Markov models for phylogenetic comparative datasets. Methods in Ecology and Evolution, 12(3), 468-478.
+
+FitzJohn, R. G., Maddison, W. P., & Otto, S. P. (2009). Estimating trait-dependent speciation and extinction rates from incompletely resolved phylogenies. Systematic biology, 58(6), 595-611.
+
+Ingram, T., Harrison, A., Mahler, D. L., Castañeda, M. D. R., Glor, R. E., Herrel, A., ... & Losos, J. B. (2016). Comparative tests of the role of dewlap size in Anolis lizard speciation. Proceedings of the Royal Society B: Biological Sciences, 283(1845), 20162199.
+
+Maddison, W. P., Midford, P. E., & Otto, S. P. (2007). Estimating a binary character's effect on speciation and extinction. Systematic biology, 56(5), 701-710.
+
+Mahler, D. L., Revell, L. J., Glor, R. E., & Losos, J. B. (2010). Ecological opportunity and the rate of morphological evolution in the diversification of Greater Antillean anoles. Evolution, 64(9), 2731-2745.
+
+Revell, L. J., Schliep, K. P., Mahler, D. L., & Ingram, T. (2021). Testing for heterogeneous rates of discrete character evolution on phylogenies. bioRxiv, 2021-09.
+
+Williams, J. H., Taylor, M. L., & O'Meara, B. C. (2014). Repeated evolution of tricellular (and bicellular) pollen. American Journal of Botany, 101(4), 559-571.
