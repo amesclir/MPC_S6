@@ -11,13 +11,14 @@ editor_options:
 MODELO DE PAGEL
 
 Mark Pagel (1994) diseño un modelo para comprobar la evolución dependiente de dos caracteres binarios. Lo llamamos a este modelo el model Pagel94.
-Sgiguiendo este método ajustamos dos modelos diferente y los comparamos. El primero de ellos es el modelo independiente que básicamente es ajustar el modelo Mk de manera independiente a nuestros dos rasgos binarios. La probabilidad del modelo independiente es justo el producto de la probabilidad de cada modelo (o lo que es lo mismo la suma de los logaritmos de las probabilidades).
-El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgos binario depende Del otro y viceversa.
+Siguiendo este método ajustamos dos modelos diferente y los comparamos. El primero de ellos es el modelo independiente que básicamente es ajustar el modelo Mk de manera independiente a nuestros dos rasgos binarios. La probabilidad del modelo independiente es justo el producto de la probabilidad de cada modelo (o lo que es lo mismo la suma de los logaritmos de las probabilidades).
+El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgo binario depende del otro y viceversa.
 En este segundo caso si tenemos dos rasgos A y B que tienen cada uno de ellos estados de caracter 0 y 1 lo que ocurre es que algunas de las combinaciones posibles (0+0, 0+1, 1+0, 1+1) tienden a aparecer juntas a lo largo de evolución y otras tiende a no aparecer juntas.
 Muchas veces el modelo dependiente se ajusta mejor que el independiente y podremos decir que esos dos caracteres tienen una evolución correlacionada (pero hay que tener cuidado, esto puede pasar incluso cuando no hay evolución correlacionada, por ejemplo cuando la tasa de evolución del caracter A depende del estado de caracter en B).
 
 Para ver estos modelos vamos a utilizar los datos publicados orginalmente por Benun Sutton & Wilson (2019). En este estudio los autores proponen que el cuidado parterno en peces oseos podría estar correlacionado con un caracter comportamental llamado pareja de desove que implica monogamia.
 Carguemos los datos disponible en este proyecto de R y comprobemos la hipótesis.
+
 ```{r}
 
 ## load the phytools package
@@ -152,6 +153,7 @@ set.seed(7)
 ## create a transition matrix between states under
 ## a simple, Mk model
 Q.mk<-matrix(c(-1,1,1,-1),2,2,dimnames=list(0:1,0:1))
+Q.mk
 ## simulate a character history under this constant
 ## rate model
 mk.tree<-sim.history(tree<-pbtree(n=100,scale=2),Q.mk,anc="0")
@@ -194,10 +196,10 @@ mtext("(c)",line=0,adj=0)
 
 ```
 
-Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente entre estados y otras veces el estado de caracter 1 se mantiene estabale en a lo largo de mucho tiempo evolutivo (en el panel a los cambios son simpre frecuentes). En el panel b podemos observar que en realidad estamos en el estado 1* cuando en el panel c pensamos que estamos en el estado 1.
+Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente entre estados y otras veces el estado de caracter 1 se mantiene estable en a lo largo de mucho tiempo evolutivo (en el panel a los cambios son simpre frecuentes). En el panel b podemos observar que en realidad estamos en el estado 1* cuando en el panel c pensamos que estamos en el estado 1.
 
 
-Pasemos ahora a ajutar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en el linaje squamatae.
+Pasemos ahora a ajustar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en el linaje squamatae.
 Recordemos que el segundo mejor modelo apoyaba una tedencía direccional hacia la perdida de dedos.
 Esta pérdida de dedos e incluso las extremidades ha pasado de manera muy reciente en algunos clado como el de los eslizones pero, sin embargo, ha pasado hace mucho tiempo en la evolución del grupo como por ejemplo en las serpientes.
 Nuestra hipótesis es que podríamos estar antes un modelo con tasas ocultas.
@@ -263,7 +265,7 @@ Y por ultimo un modelo sin estados ni tasas ocultas. Lo ajustamos con la misma f
 ## fit a HRM with a hidden state for limbed but not limbless
 ## fit a standard ARD model using fitHRM
 limb.Mk<-fitHRM(sqTree.pruned,limbs,ncat=1,model="ARD",umbral=TRUE,pi="fitzjohn",niter=1,opt.method="nlminb")
-print(limb.HRM3,digits=4)
+print(limb.Mk,digits=4)
 ```
 
 Representemos nuestros modelos para visualizarlos mejor.
@@ -292,7 +294,7 @@ El mejor modelos es el más simple. Y el segundo mejor el limbless hidden.
 
 Vamos a ver otro ejemplo pero esta vez vamos a usar el la función corHMM del paquete con el mismo nombre (Beaulieu et al., 2013; Boyko & Beaulieu, 2021)
 
-Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del polen bicelular y tricelular. Usaremos un subconjunto de datos  para agelizar el proceso computacional.
+Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del polen bicelular y tricelular. Usaremos un subconjunto de datos  para agilizar el proceso computacional.
 
 Carguemos lo datos, observemoslos y preparemoslos para los análisis. Fíjate que para usar corHMM hemos puesto los datos de polén en un formato concreto.
 
@@ -376,7 +378,7 @@ legend("topleft",rownames(fit.pollen$solution)[c(1,3,5,2,4,6)],pch=15,col=COLS[c
 #####################
 ACTIVIDADES.
 
-1. El modelo de Pagel94 que hemos utilizado es en el que el caracter x depende de y viceversa. No obstante, también se puede ajustar este modelo de manera que x depende y y no al contrario, o bien que y depende de x y no al contrario. Ajusta esos modelos a nuestro caso de estudio del cuidado parental en peces óseos y compáralo con el modelo de Pagel original.
+1. El modelo de Pagel94 que hemos utilizado es en el que el caracter x depende de y viceversa. No obstante, también se puede ajustar este modelo de manera que x depende y y no al contrario, o bien que y depende de x y y no al contrario. Ajusta esos modelos a nuestro caso de estudio del cuidado parental en peces óseos y compáralo con el modelo de Pagel original.
 
 ```{r}
 ##Your code here
