@@ -63,12 +63,12 @@ plot(parentalCare.fit,signif=4,cex.main=1,cex.sub=0.8,cex.traits=0.7,cex.rates=0
 Podemos apreciar como el cuidado parental y el comportamiento par de desove están evolutivamente correlacionados. 
 
 
-MODELOS DE EVOLUCÓN DE CARACTERES DISCRETOS CON MÚLTIPLES REGÍMENES
+MODELOS DE EVOLUCIÓN DE CARACTERES DISCRETOS CON MÚLTIPLES REGÍMENES
 
-Esto lo podemos hacer al menos de dos manera diferentes.
+Esto lo podemos hacer al menos de dos maneras diferentes.
 En el primer método que vamos a estudiar propondremos diferentes regímenes para la evolución de nuestro caracter discreto y representaremos dichos regímenes en la filogenia (Revell et al., 2021). En realidad esto es muy parecido a lo que hicimos para comprobar diferenTes regímenes del modelo OU en la clase anterior.
 
-Para ilustrar este modelo vamos a utilizar data set de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretametne del color de la papada de los lagartos.
+Para ilustrar este modelo vamos a utilizar data sets de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretametne del color de la papada de los lagartos.
 
 Carguemos los datos (los preparamos) y echemosle un vistazo.
 
@@ -196,7 +196,7 @@ mtext("(c)",line=0,adj=0)
 
 ```
 
-Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente entre estados y otras veces el estado de caracter 1 se mantiene estable en a lo largo de mucho tiempo evolutivo (en el panel a los cambios son simpre frecuentes). En el panel b podemos observar que en realidad estamos en el estado 1* cuando en el panel c pensamos que estamos en el estado 1.
+Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente entre estados y otras veces el estado de caracter 1 se mantiene estable en a lo largo de mucho tiempo evolutivo (en el panel a los cambios son siempre frecuentes). En el panel b podemos observar que en realidad estamos en el estado 1* cuando en el panel c pensamos que estamos en el estado 1.
 
 
 Pasemos ahora a ajustar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en el linaje squamatae.
@@ -259,7 +259,7 @@ print(limb.HRM3,digits=4)
 
 ```
 
-Y por ultimo un modelo sin estados ni tasas ocultas. Lo ajustamos con la misma función que los otros pero lo podríamos hacer con las funciones fitDriscrete de geiger o fitMk de phytools. Esto nos lleva a la conclusión de que los modelos estándares de Mk son casos especiales de los modelos con tasas ocultas.
+Y por ultimo un modelo sin estados ni tasas ocultas. Lo ajustamos con la misma función que los otros pero lo podríamos hacer con las funciones fitDiscrete de geiger o fitMk de phytools. Esto nos lleva a la conclusión de que los modelos estándares de Mk son casos especiales de los modelos con tasas ocultas.
 
 ```{r}
 ## fit a HRM with a hidden state for limbed but not limbless
