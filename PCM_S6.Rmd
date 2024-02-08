@@ -200,7 +200,7 @@ Lo que vemos es que en el panel c, algunas veces el caracter cambia rápidamente
 
 
 Pasemos ahora a ajustar nuestro modelo hidden-rates con datos reales. Usemos el set de datos del número de dedos en el linaje squamatae.
-Recordemos que el segundo mejor modelo apoyaba una tedencía direccional hacia la perdida de dedos.
+Recordemos que el mejor modelo apoyaba una tedencía direccional hacia la perdida de dedos.
 Esta pérdida de dedos e incluso las extremidades ha pasado de manera muy reciente en algunos clado como el de los eslizones pero, sin embargo, ha pasado hace mucho tiempo en la evolución del grupo como por ejemplo en las serpientes.
 Nuestra hipótesis es que podríamos estar antes un modelo con tasas ocultas.
 Vamos a correr nuestro modelo como un caracter binario de pérdida o ganacia de extremidades (no vamos a tratar la evolución del número de dedos). 
@@ -213,6 +213,7 @@ sqData<-read.csv("squamate-data.csv",row.names=1)
 sqTree<-read.nexus("squamate.tre")
 ## match tree and data
 chk<-name.check(sqTree,sqData)
+chk
 sqTree.pruned<-drop.tip(sqTree,chk$tree_not_data)
 sqData.pruned<-sqData[sqTree.pruned$tip.label,,drop=FALSE]
 ## extra number of hindfoot toes
@@ -227,6 +228,7 @@ limbs[toes>0]<-"limbed"
 limbs[toes==0]<-"limbless"
 ## convert to factor
 limbs<-as.factor(limbs)
+limbs
 ```
 
 Ya estamos listos para ajustar nuestro modelo. Para ello vamos a utilizar la función fitHRM de phytools.
@@ -292,7 +294,7 @@ data.frame(model=c("4-state HRM","limbless hidden","limbed hidden","Mk model"),l
 El mejor modelos es el más simple. Y el segundo mejor el limbless hidden.
 
 
-Vamos a ver otro ejemplo pero esta vez vamos a usar el la función corHMM del paquete con el mismo nombre (Beaulieu et al., 2013; Boyko & Beaulieu, 2021)
+Vamos a ver otro ejemplo pero esta vez vamos a usar el la función corHMM del paquete con el mismo nombre (Beaulieu et al., 2013; Boyko & Beaulieu, 2021).
 
 Para ello usaremos lo datos de Williams et al., (2014) en la que los autores investigan la evolución del polen bicelular y tricelular. Usaremos un subconjunto de datos  para agilizar el proceso computacional.
 
