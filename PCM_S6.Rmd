@@ -10,13 +10,13 @@ editor_options:
 
 MODELO DE PAGEL
 
-Mark Pagel (1994) diseño un modelo para comprobar la evolución dependiente de dos caracteres binarios. Lo llamamos a este modelo el model Pagel94.
+Mark Pagel (1994) diseñó un modelo para comprobar la evolución dependiente de dos caracteres binarios. Lo llamamos a este modelo el model Pagel94.
 Siguiendo este método ajustamos dos modelos diferente y los comparamos. El primero de ellos es el modelo independiente que básicamente es ajustar el modelo Mk de manera independiente a nuestros dos rasgos binarios. La probabilidad del modelo independiente es justo el producto de la probabilidad de cada modelo (o lo que es lo mismo la suma de los logaritmos de las probabilidades).
 El segundo modelo que ajustamos es el modelo dependiente en el que el estado de caracter de un rasgo binario depende del otro y viceversa.
 En este segundo caso si tenemos dos rasgos A y B que tienen cada uno de ellos estados de caracter 0 y 1 lo que ocurre es que algunas de las combinaciones posibles (0+0, 0+1, 1+0, 1+1) tienden a aparecer juntas a lo largo de evolución y otras tiende a no aparecer juntas.
 Muchas veces el modelo dependiente se ajusta mejor que el independiente y podremos decir que esos dos caracteres tienen una evolución correlacionada (pero hay que tener cuidado, esto puede pasar incluso cuando no hay evolución correlacionada, por ejemplo cuando la tasa de evolución del caracter A depende del estado de caracter en B).
 
-Para ver estos modelos vamos a utilizar los datos publicados orginalmente por Benun Sutton & Wilson (2019). En este estudio los autores proponen que el cuidado parterno en peces oseos podría estar correlacionado con un caracter comportamental llamado pareja de desove que implica monogamia.
+Para ver estos modelos vamos a utilizar los datos publicados originalmente por Benun Sutton & Wilson (2019). En este estudio los autores proponen que el cuidado parterno en peces oseos podría estar correlacionado con un caracter comportamental llamado pareja de desove que implica monogamia.
 Carguemos los datos disponible en este proyecto de R y comprobemos la hipótesis.
 
 ```{r}
@@ -52,9 +52,9 @@ print(parentalCare.fit)
 
 ```
 
-Podemos apreciar como el ajuste del modelo dependiente es bastante mejor que el ajuste del modelo indpediente. Esto nos permite concluir que estos dos rasgos están evolutivamente correlacionados.
+Podemos apreciar como el ajuste del modelo dependiente es bastante mejor que el ajuste del modelo indepediente. Esto nos permite concluir que estos dos rasgos están evolutivamente correlacionados.
 
-Veamos una represetnación del modelo.
+Veamos una representación del modelo.
 
 ```{r}
 plot(parentalCare.fit,signif=4,cex.main=1,cex.sub=0.8,cex.traits=0.7,cex.rates=0.7,lwd=1)
@@ -66,9 +66,10 @@ Podemos apreciar como el cuidado parental y el comportamiento par de desove est�
 MODELOS DE EVOLUCIÓN DE CARACTERES DISCRETOS CON MÚLTIPLES REGÍMENES
 
 Esto lo podemos hacer al menos de dos maneras diferentes.
+
 En el primer método que vamos a estudiar propondremos diferentes regímenes para la evolución de nuestro caracter discreto y representaremos dichos regímenes en la filogenia (Revell et al., 2021). En realidad esto es muy parecido a lo que hicimos para comprobar diferenTes regímenes del modelo OU en la clase anterior.
 
-Para ilustrar este modelo vamos a utilizar data sets de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretametne del color de la papada de los lagartos.
+Para ilustrar este modelo vamos a utilizar data sets de los lagartos del género Anolis (Maghler et al., 2010; Insgram et al., 2016). Concretamente del color de la papada de los lagartos.
 
 Carguemos los datos (los preparamos) y echemosle un vistazo.
 
@@ -292,7 +293,7 @@ Y comparamos el ajuste de los cuatro modelos.
 data.frame(model=c("4-state HRM","limbless hidden","limbed hidden","Mk model"),logL=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),logLik),k=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),function(x) length(x$rates)),AIC=sapply(list(limb.HRM1,limb.HRM2,limb.HRM3,limb.Mk),AIC))
 ```
 
-El mejor modelos es el más simple. Y el segundo mejor el limbless hidden.
+El mejor modelo es el más simple. Y el segundo mejor el limbless hidden.
 
 
 Vamos a ver otro ejemplo pero esta vez vamos a usar el la función corHMM del paquete con el mismo nombre (Beaulieu et al., 2013; Boyko & Beaulieu, 2021).
@@ -302,6 +303,7 @@ Para ello usaremos lo datos de Williams et al., (2014) en la que los autores inv
 Carguemos los datos, observemoslos y preparemoslos para los análisis. Fíjate que para usar corHMM hemos puesto los datos de polén en un formato concreto.
 
 ```{r}
+
 ## read tree
 pollen.tree<-read.tree(file="pollen-tree.phy")
 print(pollen.tree,printlen=3)
